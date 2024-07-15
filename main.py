@@ -58,10 +58,12 @@ for n in range(n_epochs):
             dom_batch = dom_batch.to(device)
             optimizer.zero_grad()
             pred_lab, pred_dom, emb_lab, emb_dom = model(x_batch, m_batch)
+            emb_lab = nn.functional.normalize(emb_lab)
+            emb_dom = nn.functional.normalize(emb_dom)
             loss_ortho = torch.mean(torch.sum(emb_lab*emb_dom,dim=1))
             loss_lab = loss_fn(pred_lab, y_batch)
             
-            loss =  loss_lab 
+            loss =  loss_lab + loss_ortho
             
             loss.backward()
             optimizer.step()
@@ -116,6 +118,8 @@ for n in range(n_epochs):
                                                                             #ou un pseudo label de confiance
             
             pred_lab, pred_dom, emb_lab, emb_dom = model(x_batch, m_batch)
+            emb_lab = nn.functional.normalize(emb_lab)
+            emb_dom = nn.functional.normalize(emb_dom)
             loss_ortho = torch.mean(torch.sum(emb_lab*emb_dom,dim=1))
             loss_lab = loss_fn(pred_lab[ind_loss],y_batch[ind_loss])
             loss_dom = loss_fn(pred_dom,dom_batch)
@@ -146,7 +150,8 @@ for n in range(n_epochs):
             
             model.eval()
             pred_lab, pred_dom, emb_lab, emb_dom = model(x_batch, m_batch)
-            
+            emb_lab = nn.functional.normalize(emb_lab)
+            emb_dom = nn.functional.normalize(emb_dom)
             yul_batch = [ torch.argmax(pred_lab[k]) if max(pred_lab[k])>0.95 else torch.tensor(-1) for k in i_ul]  # pseudo label pour les données non labelisée 
             #yul_batch_info = y_batch_info[i_ul]                                                                 # contient les vrais labels des données considérées
                                                                                                                 # non labélisées
