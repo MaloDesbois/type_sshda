@@ -364,14 +364,14 @@ def data_loading(datas ,nbr_s=100000,nbr_t=100000): #data est de la forme [[jeux
         list_labels_train = torch.tensor(list_labels_train, dtype=torch.int64)
         list_domain_train = torch.tensor(list_domain_train,dtype=torch.int64)
        
+        print(torch.min(list_labels_train))
         
         list_values_train1 = torch.tensor(list_values_train1,dtype=torch.float32)
         list_labels_train1 = torch.tensor(list_labels_train1, dtype=torch.int64)
         list_domain_train1 = torch.tensor(list_domain_train1,dtype=torch.int64)
         
-        print(list_labels_train1.shape)
-        print(list_values_train1.shape)
-        print(list_domain_train1.shape)
+        
+        
         
         list_values_train2 = torch.tensor(list_values_train2,dtype=torch.float32)
         list_labels_train2 = torch.tensor(list_labels_train2, dtype=torch.int64)
@@ -444,6 +444,30 @@ class EarlyStopping:
         self.early_stop = False
 
 
+class my_transformation:
+    def __init__(self,p,liste_transformation,device): # liste_transformation contient 
+        self.p=p
+        self.l_transformation = liste_transformation
+        self.device = device 
+    def augment(self,x,mask):
+        for transformation in self.l_transformation : 
+            if torch.rand(1)<self.p :                 # on prend la transformation avec une proba p
+                if isinstance(transformation, type(dropout(p=0.8))):
+                    
+                    x, mask = transformation.augment(x, mask)
+                else :
+                    
+                    x = np.array(x.cpu())
+                    x = transformation.augment(x)
+                    x = torch.tensor(x).to(self.device)
+            else : 
+                pass
+        return x, mask
+                
+                    
+            
+            
+            
         
         
 
