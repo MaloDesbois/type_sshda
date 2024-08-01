@@ -95,8 +95,8 @@ for n in range(n_epochs):
             y_batch = y_batch.to(device)
             dom_batch = dom_batch.to(device)
             
-            i_l = [k for k in range(len(y_batch)) if y_batch[k] != -1 ]
-            i_ul = [k for k in range(len(y_batch)) if y_batch[k] == -1 ]
+            i_l = torch.where(y_batch != -1)
+            i_ul = torch.where(y_batch == -1)
             xl_batch,ml_batch, doml_batch = x_batch[i_l],mask_batch[i_l],dom_batch[i_l]
             yl_batch = y_batch[i_l].clone().detach()
             
@@ -157,8 +157,8 @@ for n in range(n_epochs):
             y_batch = y_batch.to(device)
             dom_batch = dom_batch.to(device)
             
-            i_l = [k for k in range(len(y_batch)) if y_batch[k] != -1 ]
-            i_ul = [k for k in range(len(y_batch)) if y_batch[k] == -1 ]
+            i_l = torch.where(y_batch != -1)
+            i_ul = torch.where(y_batch == -1)
             xl_batch,ml_batch, doml_batch = x_batch[i_l],mask_batch[i_l],dom_batch[i_l]
             yl_batch = y_batch[i_l].clone().detach()
             
