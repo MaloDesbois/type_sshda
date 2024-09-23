@@ -28,7 +28,7 @@ T2020=np.load('/home/malo/Stage/Data/data modifiées 11 classes/t2020_modif.npz'
 
 n_epochs=10
 data =[[L2018],[T2019]] # [[L2018,L2019,L2020,R2018,R2019,R2020],[T2019]] 
-train_dataloader, train_dataloader1, train_dataloader2, test_dataloader,dates,data_shape = data_loading(data,nbr_s=400,nbr_t=800)
+train_dataloader, train_dataloader1, train_dataloader2, test_dataloader,dates,data_shape = data_loading(data,nbr_s=400,nbr_t=800) # 3 dataloader pour ajouter les données petit à petit
 data_shape=(data_shape[0],data_shape[2],data_shape[1])
 
 config={'emb_size':64,'num_heads':8,'Data_shape':data_shape,'Fix_pos_encode':'tAPE','Rel_pos_encode':'eRPE','dropout':0.2,'dim_ff':64}
@@ -49,13 +49,13 @@ optimizer = torch.optim.AdamW(params=model.parameters(), lr=learning_rate)
 nom_transformation ="add_noise"
 valid_f1 = 0.
 liste_transformation = [tsaug.AddNoise(scale=0.01), tsaug.Quantize(n_levels=20), tsaug.TimeWarp(n_speed_change=5, max_speed_ratio=3), dropout(p=0.8)]
-transformation = my_transformation(0.3,liste_transformation,device)
+transformation = my_transformation(0.3,liste_transformation,device)     # Les transformations utilisées sur les données pseudo-labélisées. Sélection aléatoire de chaque transformation dans la liste.
 for n in range(n_epochs):
     print(f'éqpoue {n+1}')
     tot_pred = []
     tot_labels = []
     start = time.time()
-    if n < 5 :
+    if n < 5 :         # échauffement du modèle sur des donées labélisées
         
         for xm_batch, y_batch_, dom_batch in train_dataloader:
             x_batch,m_batch = xm_batch[:,:,:2],xm_batch[:,:,2] # m_batch correspond aux mask du batch
@@ -83,7 +83,7 @@ for n in range(n_epochs):
             tot_pred.append( pred_npy )
             tot_labels.append( y_batch.cpu().detach().numpy())
             
-    elif 5<n<10 :
+    elif 5<n<10 : # ajout d'une partie des données non labélisées
         
         tot_pred_pl = []
         tot_labels_pl = []
@@ -145,7 +145,7 @@ for n in range(n_epochs):
             tot_pred.append( pred_npy )
             tot_labels.append( y_batch.cpu().detach().numpy())
             
-    else :
+    else : # ajout du reste des données non labélisées
         
         tot_pred_pl = []
         tot_labels_pl = []
